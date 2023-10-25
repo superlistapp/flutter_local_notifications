@@ -86,6 +86,8 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
     var launchingAppFromNotification = false
     let presentationOptionsUserDefaults = "flutter_local_notifications_presentation_options"
 
+    static var registered = false;
+
     // MARK: - FlutterPlugin initialization and registration
 
     init(fromChannel channel: FlutterMethodChannel) {
@@ -93,6 +95,13 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
     }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
+        if (registered) {
+            return;
+        }
+        registered = true;
+        // Above is a hacky workaround to prevent attempting to register (and replacing) the notification
+        // center delegate multiple times.
+
         let channel = FlutterMethodChannel(name: "dexterous.com/flutter/local_notifications", binaryMessenger: registrar.messenger)
         let instance = FlutterLocalNotificationsPlugin.init(fromChannel: channel)
         if #available(macOS 10.14, *) {
